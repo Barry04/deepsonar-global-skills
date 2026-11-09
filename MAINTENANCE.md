@@ -24,7 +24,7 @@ DeepSonar 的全局 Git Skill 源与项目 Memory/Skill 是两条链路：
 - 项目知识由正在运行的 Job 使用 `request_project_knowledge` 请求首次整理，或通过实际 usage 的 `record_knowledge_feedback` 请求修订；候选经独立评测和检查后激活。
 - Job 成功结束不会自行把任务日志写入 Git 仓库。现有项目知识操作也不授予 GitHub 写权限。
 
-本仓初始为私有仓库。Scheduler 的 Git 同步环境必须先具备对此仓库的只读访问能力；本机 `gh` 已登录不代表 Docker 容器自动取得相同权限。不要把 GitHub Token 放进 repo_url 或 Skill 正文。
+本仓于 2026-11-09 经用户明确选择改为公开，通过匿名 HTTPS 接入 DeepSonar。Skill 源 ID 为 `f0a4598c-dee6-429b-bcd3-3382a824d33c`；基线同步并核对23模块后，已审批为 trusted + enabled。后续内容修改仍需重新同步和按平台契约检查候选；仅影响新 Job 的冻结目录。不要提交项目私有证据或把 GitHub Token 放进 repo_url、正文及日志。
 
 ## 后续任务沉淀的验收点
 

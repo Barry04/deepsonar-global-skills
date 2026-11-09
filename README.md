@@ -2,7 +2,7 @@
 
 > Barry 全局 Skill 维护仓库：[Barry04/deepsonar-global-skills](https://github.com/Barry04/deepsonar-global-skills)。
 > 初始内容来自 [SummerSec/DeepSonar-Skills](https://github.com/SummerSec/DeepSonar-Skills)，基线提交 `063872aaa398194b89804cbe87d6685472b56655`，包含 23 个 Skill；保留原有历史、署名及 Apache-2.0 许可证。此初始化没有新增由任务结果提炼的 Skill。
-> 后续维护、项目知识与全局 Skill 的分工见 [MAINTENANCE.md](MAINTENANCE.md)。仓库创建不表示 DeepSonar 已切换模块源或已具备自动回写 GitHub 的能力。
+> 后续维护、项目知识与全局 Skill 的分工见 [MAINTENANCE.md](MAINTENANCE.md)。2026-11-09经用户选择公开并接入DeepSonar，23模块已同步且trusted+enabled；任务知识仍按项目治理流程沉淀，当前没有自动回写GitHub的能力。
 
 DeepSonar / Agent 用的 **高危安全技能仓**（单仓库）：
 
