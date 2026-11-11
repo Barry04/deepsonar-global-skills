@@ -12,6 +12,7 @@
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { join, dirname, resolve, relative, basename, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { execFileSync } from "node:child_process";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SKIP_DIRS = new Set([".git", "node_modules"]);
@@ -261,6 +262,52 @@ check("web_asset / web_scope 枚举 ↔ web-asset-scope 表一致", () => {
   }
   return out;
 });
+
+// ---------- 8. bulletin-hunting 解析器（纯函数，无网络） ----------
+const bulletinParserFindings = (() => {
+  const out = [];
+  const dir = "bulletin-hunting";
+  for (const p of [`${dir}/README.md`, `${dir}/.claude-plugin/plugin.json`, `${dir}/skills/bulletin-driven-hunting/SKILL.md`]) {
+    if (!existsSync(join(ROOT, p))) out.push(`缺少文件：${p}`);
+  }
+  const script = join(ROOT, `${dir}/scripts/parse-bulletin.mjs`);
+  if (!existsSync(script)) {
+    out.push(`缺少文件：${dir}/scripts/parse-bulletin.mjs`);
+    return out;
+  }
+  const presence = join(ROOT, `${dir}/scripts/check-fix-presence.mjs`);
+  if (!existsSync(presence)) out.push(`缺少文件：${dir}/scripts/check-fix-presence.mjs`);
+  for (const p of [`${dir}/scripts/parse-bulletin.mjs`, `${dir}/scripts/check-fix-presence.mjs`]) {
+    const body = text(join(ROOT, p));
+    if (!body.includes("process.exitCode")) out.push(`${p}: 错误路径应设 process.exitCode，不用 process.exit 造成管道崩溃`);
+  }
+  // 解析器是 ESM；用子进程跑纯函数，避免在主校验脚本里引入顶层 await。
+  const probe = [
+    "import { splitDescription } from " + JSON.stringify(new URL(`file:///${script.replace(/\\/g, "/")}`).href) + ";",
+    "const cases = [",
+    '  ["软总线模块存在拒绝服务漏洞", "软总线模块", "拒绝服务"],',
+    '  ["UIExtension 存在跨进程页面堆叠漏洞", "UIExtension", "跨进程页面堆叠"],',
+    '  ["3D引擎模块加载gltf模型存在越界写漏洞", "3D引擎模块加载gltf模型", "越界写"],',
+    '  ["图片处理模块存在越界写漏洞。", "图片处理模块", "越界写"],',
+    "];",
+    "const bad = [];",
+    "for (const [d, c, m] of cases) {",
+    "  const g = splitDescription(d);",
+    '  if (g.component !== c || g.mechanism_raw !== m) bad.push(`${d} -> ${JSON.stringify(g)}`);',
+    "}",
+    'const u = splitDescription("文件预览在解析矢量图时存在栈溢出的风险");',
+    'if (u.component !== null || u.mechanism_raw !== "文件预览在解析矢量图时存在栈溢出的风险") bad.push("unmatched: " + JSON.stringify(u));',
+    "if (bad.length) { console.error(bad.join(\"\\n\")); process.exit(1); }",
+  ].join("\n");
+  try {
+    execFileSync(process.execPath, ["--input-type=module", "-e", probe], { encoding: "utf8", stdio: "pipe" });
+  } catch (err) {
+    const detail = `${err.stderr ?? ""}${err.stdout ?? ""}`.trim() || err.message;
+    out.push(`解析器纯函数校验失败：${detail}`);
+  }
+  return out;
+})();
+check("bulletin-hunting 解析器纯函数与目录契约", () => bulletinParserFindings);
 
 console.log(
   failures.length

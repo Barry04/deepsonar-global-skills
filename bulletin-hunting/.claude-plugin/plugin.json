@@ -1,0 +1,8 @@
+{
+  "name": "bulletin-hunting",
+  "version": "0.1.0",
+  "description": "公告驱动的漏洞挖掘方法论：把华为手机/平板月度安全更新等厂商定期披露，转成可审计的组件、版本窗口与补丁差分入口，产出候选点并移交定级。不定级。",
+  "author": {
+    "name": "DeepSonar"
+  }
+}

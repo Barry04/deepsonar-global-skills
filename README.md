@@ -15,6 +15,7 @@ DeepSonar / Agent 用的 **高危安全技能仓**（单仓库）：
 | **Web 黑盒** | `web-blackbox-*`：已授权 Web 目标上的漏洞验证；**工具预装进 agent 环境** |
 | **组织方式** | 定义按 **领域**、审计按 **漏洞类型** 各一个 plugin（白盒、黑盒对称）；另有 **方法论** plugin（如 `mobile-audit`） |
 | **移动方法论** | **`mobile-audit`**：APK/IPA 怎么挖/复现/取证；**不定级**（配合 `vuln-definitions` + `vuln-definitions-mobile`） |
+| **公告方法论** | **`bulletin-hunting`**：把厂商月度安全公告转成组件/机理/版本基线与补丁差分入口；**不定级**（配合 `vuln-definitions` + `vuln-definitions-oh`） |
 | **报告范围** | `wb-*`/`bb-*` 定级后 **只报告 Critical / High**；**OH / Chrome / DB / Mobile 官方四档均可报** |
 
 > 使用前阅读 [DISCLAIMER.md](./DISCLAIMER.md) 与 [shared/authorization.md](./shared/authorization.md)。
@@ -46,6 +47,9 @@ DeepSonar-Skills/
 ├── mobile-audit/                # 【方法论插件】移动 App（APK/IPA）审计（不定级）
 │   ├── README.md
 │   └── skills/mobile-app-audit/ # SKILL.md + references/（recon…tooling）
+├── bulletin-hunting/            # 【方法论插件】公告驱动挖洞（不定级）
+│   ├── README.md
+│   └── skills/bulletin-driven-hunting/ # SKILL.md + references/（源…移交）
 ├── shared/                      # 报告策略、finding 格式、授权
 │   ├── severity-policy.md       # 默认只报 C/H（report_policy 可放开）；OH / Chrome / DB / Mobile 四档例外（细则见对应插件）
 │   ├── finding-schema.md
@@ -96,6 +100,12 @@ DeepSonar-Skills/
 | -------- | ------- | ------ |
 | **mobile-audit** | `mobile-app-audit` | Android APK / iOS IPA：静态攻击面、代码流、混合栈/SDK、真机与 PoC、证据包；**NEVER 自产 severity**（须同时启用 vuln-definitions + vuln-definitions-mobile） |
 
+### 方法论 `bulletin-hunting`
+
+| Plugin | Skill | 职责 |
+| -------- | ------- | ------ |
+| **bulletin-hunting** | `bulletin-driven-hunting` | 厂商月度安全公告 → 结构化基线、分诊、组件归因、补丁差分反推、分支滞后检测、候选移交；**NEVER 自产 severity**（须同时启用 vuln-definitions + vuln-definitions-oh）；不复现已公开 CVE |
+
 ### 白盒 `web-whitebox-*`（Web 安全）
 
 | Plugin | Skill | 只关心 |
@@ -133,6 +143,7 @@ DeepSonar-Skills/
 /plugin install vuln-definitions-db@DeepSonar-Skills      # 数据库（ClickHouse 等）
 /plugin install vuln-definitions-mobile@DeepSonar-Skills  # 移动端（Android / iOS App）定级
 /plugin install mobile-audit@DeepSonar-Skills             # 移动 App（APK/IPA）审计方法论
+/plugin install bulletin-hunting@DeepSonar-Skills         # 公告驱动挖洞方法论
 /plugin install web-whitebox-injection@DeepSonar-Skills
 /plugin install web-blackbox-injection@DeepSonar-Skills
 # 按需安装其他 type
@@ -154,6 +165,7 @@ POST /skill-sources
 - 审计角色：`web-whitebox-injection`、`web-whitebox-rce`、…  
 - 黑盒角色：`web-blackbox-ssrf`、`web-blackbox-authz`、…  
 - 移动 App：`mobile-audit` + `vuln-definitions` + `vuln-definitions-mobile`  
+- 公告驱动：`bulletin-hunting` + `vuln-definitions` + `vuln-definitions-oh`  
 
 ### 本地 skills CLI
 

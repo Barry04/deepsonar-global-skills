@@ -11,6 +11,7 @@
 4. **web-whitebox-*** — Web 白盒审计（按漏洞类型）  
 5. **web-blackbox-*** — Web 黑盒挖掘（按漏洞类型，工具在 agent-env）  
 6. **mobile-audit** — 移动客户端 App（APK/IPA）审计**方法论**（不定级；定级依赖 vuln-definitions + vuln-definitions-mobile）  
+7. **bulletin-hunting** — 厂商安全公告驱动挖洞**方法论**（不定级；定级依赖 vuln-definitions + vuln-definitions-oh；不复现已公开 CVE）
 
 定级含 **严重 / 高危 / 中危 / 无危害**；**wb-*/bb-* 正式报告默认仅 Critical/High**（`report_policy: program_table` 时含 medium 及该程序表的 low）；**vuln-definitions-oh / vuln-definitions-chrome / vuln-definitions-db / vuln-definitions-mobile 官方四档均可报**。定量分支持 **CVSS v3.1（默认）与 v4.0（按需）**。
 
@@ -32,6 +33,8 @@
 
 **方法论 plugin（非 definitions 领域）**：`mobile-audit/` 是移动 App **怎么挖/复现/取证** 的执行层，**不是** 新的 `vuln-definitions-<domain>`。移动端定级语义仍只在 `vuln-definitions-mobile`；新 App/SDK 目标仍只加厂商 reference，不开新 definitions plugin。
 
+`bulletin-hunting/` 同理：它是「公告 → 组件/版本基线 → 补丁差分 → 候选」的执行层，**不是** 新的 definitions 领域，也不承载档位语义；系统类档位仍只在 `vuln-definitions-oh`。
+
 > 本仓内容几乎全是 Markdown（SKILL.md / plugin.json / references），**没有构建与 lint 流程**。`package.json` 提供元数据与一个零依赖一致性校验脚本（`npm run check`，见 `scripts/check-consistency.mjs`）；变更正确性主要靠结构约定、该脚本与人工审查保证。
 
 ## 目录约定
@@ -46,6 +49,9 @@ vuln-scoring/             # 独立插件：CVSS v3.1/v4.0 按需评分 + 优先�
 mobile-audit/             # 方法论插件：移动 App（APK/IPA）怎么挖/复现/取证（不定级）
   .claude-plugin/plugin.json
   skills/mobile-app-audit/SKILL.md + references/
+bulletin-hunting/         # 方法论插件：厂商安全公告驱动挖洞（不定级）
+  .claude-plugin/plugin.json
+  skills/bulletin-driven-hunting/SKILL.md + references/
 web-whitebox/<type>/      # Web 白盒 plugin
   .claude-plugin/plugin.json
   skills/wb-<type>/SKILL.md
@@ -68,6 +74,7 @@ agent-env/                # 黑盒工具内置清单与镜像（当前偏 Web；
 2. **`vuln-scoring/`** 是**定量评分与利用优先级**模块：支持 **CVSS v3.1 与 v4.0**（先选版本再按需加载指标文件），并映射回四级定级；可选 EPSS / SSVC / CISA KEV 做修复排序。**不替代**定性条款，finding 的 `severity` 仍以 definitions 为准。
 3. **`web-whitebox/<type>/` 与 `web-blackbox/<type>/`** 对称分布；每个插件 = `.claude-plugin/plugin.json` + `skills/<wb|bb>-<type>/SKILL.md` + `references/`（白盒是 `sinks.md`，黑盒是 `payloads.md` + `tooling.md`）。
 3b. **`mobile-audit/`** 是移动 App **方法论** plugin（单 skill `mobile-app-audit`）：静态/动态/PoC/取证工作流；**NEVER 自产 severity**；强制依赖 `vuln-definitions` + `vuln-definitions-mobile`。不是新 definitions 领域。
+3c. **`bulletin-hunting/`** 是公告驱动 **方法论** plugin（单 skill `bulletin-driven-hunting`）：公告基线、分诊、归因、补丁差分、分支滞后、候选移交；**NEVER 自产 severity**；强制依赖 `vuln-definitions` + `vuln-definitions-oh`。不是新 definitions 领域。
 4. **`shared/`** 是仓库级契约：`severity-policy.md`（默认只报 C/H；OH / Chrome / DB / Mobile 四档例外；`report_policy` 开关）、`finding-schema.md`（统一 finding YAML，含 `cvss` 块与 `data_scale` / `regression_of` / `report_policy` 等可追溯字段）、`authorization.md`。
 
 ### SKILL.md 通用骨架
@@ -124,6 +131,7 @@ docker build -f agent-env/Dockerfile.blackbox -t deepsonar-blackbox-agent:0.1 .
 /plugin install vuln-definitions-db@DeepSonar-Skills   # 数据库（ClickHouse 等）审计时
 /plugin install vuln-definitions-mobile@DeepSonar-Skills   # 移动端（Android / iOS App）定级时
 /plugin install mobile-audit@DeepSonar-Skills              # 移动 App（APK/IPA）审计方法论（须同时装上两定义插件）
+/plugin install bulletin-hunting@DeepSonar-Skills          # 公告驱动挖洞方法论（须同时装上 vuln-definitions + vuln-definitions-oh）
 /plugin install web-whitebox-injection@DeepSonar-Skills
 ```
 
@@ -137,6 +145,7 @@ docker build -f agent-env/Dockerfile.blackbox -t deepsonar-blackbox-agent:0.1 .
 1f. **改 Web 领域层（形态表 / 资产范围 / 门禁 / 目标程序规则）** → 只改 `vuln-definitions/references/web-*.md`（及 `vendor-<program>.md`），bump `vuln-definitions` version；**Web 新目标（项目 / 程序）只加 `vendor-<program>.md`，不开新 plugin**，也不新建审计 plugin（另行立项）  
 2. **改 CVSS/利用评分/优先级标准** → 只改 `vuln-scoring/`，bump 其 version  
 3. 改审计手法 → 对应 `web-whitebox-*` / `web-blackbox-*`；**改移动 App 挖洞/复现/取证手法** → 只改 `mobile-audit/`（bump version；**不要**把方法写进 vuln-definitions-mobile）  
+3b. **改公告驱动挖洞手法** → 只改 `bulletin-hunting/`（bump version）；公告源/抽取规则变更时同步 `references/bulletin-sources.md`；**不要**把方法写进 `vuln-definitions-oh`  
 4. 报告策略（是否上报 medium）→ `shared/severity-policy.md`  
 5. 黑盒新工具 → `agent-env/tools-manifest.json` + 镜像  
 6. marketplace 条目 version 与 plugin.json 对齐  
