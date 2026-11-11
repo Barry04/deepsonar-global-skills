@@ -48,6 +48,12 @@
       "source": "./mobile-audit"
     },
     {
+      "name": "bulletin-hunting",
+      "description": "公告驱动的漏洞挖掘方法论：把华为手机/平板月度安全更新等厂商定期披露，转成结构化组件/机理/版本基线，做分诊、组件归因、补丁差分反推与分支滞后检测，产出候选点并移交定级。不定级；定级配合 vuln-definitions 与 vuln-definitions-oh。",
+      "version": "0.1.0",
+      "source": "./bulletin-hunting"
+    },
+    {
       "name": "web-whitebox-injection",
       "description": "白盒注入审计（SQL/命令/NoSQL/LDAP）",
       "version": "0.2.1",
