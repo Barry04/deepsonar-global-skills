@@ -16,6 +16,7 @@ DeepSonar / Agent 用的 **高危安全技能仓**（单仓库）：
 | **组织方式** | 定义按 **领域**、审计按 **漏洞类型** 各一个 plugin（白盒、黑盒对称）；另有 **方法论** plugin（如 `mobile-audit`） |
 | **移动方法论** | **`mobile-audit`**：APK/IPA 怎么挖/复现/取证；**不定级**（配合 `vuln-definitions` + `vuln-definitions-mobile`） |
 | **公告方法论** | **`bulletin-hunting`**：把厂商月度安全公告转成组件/机理/版本基线与补丁差分入口；**不定级**（配合 `vuln-definitions` + `vuln-definitions-oh`） |
+| **危害说明** | **`finding-impact`** / `explain-finding-impact`：每条任务发现用大白话写实际危害、简单例子和验证边界，填入已有 `impact` 字段。见 [Skill 正文](finding-impact/skills/explain-finding-impact/SKILL.md)。 |
 | **报告范围** | `wb-*`/`bb-*` 定级后 **只报告 Critical / High**；**OH / Chrome / DB / Mobile 官方四档均可报** |
 
 > 使用前阅读 [DISCLAIMER.md](./DISCLAIMER.md) 与 [shared/authorization.md](./shared/authorization.md)。
@@ -50,6 +51,8 @@ DeepSonar-Skills/
 ├── bulletin-hunting/            # 【方法论插件】公告驱动挖洞（不定级）
 │   ├── README.md
 │   └── skills/bulletin-driven-hunting/ # SKILL.md + references/（源…移交）
+├── finding-impact/              # 缺陷危害通俗说明插件
+│   └── skills/explain-finding-impact/SKILL.md
 ├── shared/                      # 报告策略、finding 格式、授权
 │   ├── severity-policy.md       # 默认只报 C/H（report_policy 可放开）；OH / Chrome / DB / Mobile 四档例外（细则见对应插件）
 │   ├── finding-schema.md

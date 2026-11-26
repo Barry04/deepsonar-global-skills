@@ -3,6 +3,8 @@
 所有 skill 的漏洞报告必须使用下列结构（YAML 或等价 JSON）。  
 与 DeepSonar SARIF 对齐时，将 `rule_id` → ruleId，`severity` → level，其余进 properties。
 
+每条缺陷的 `impact` 必须用简短中文说明实际危害，至少给一个贴近目标的简单例子，并写清已验证范围与待验证后果。具体写法遵循 [缺陷危害通俗说明 Skill](../finding-impact/skills/explain-finding-impact/SKILL.md)。
+
 ```yaml
 id: VULN-001
 mode: whitebox | blackbox
@@ -50,7 +52,9 @@ web_scope: in_scope              # in_scope | in_scope_with_conditions | out_of_
 
 # 影响
 impact: |
-  攻击者能做什么；影响范围（用户/租户/数据/主机）
+  用大白话说明谁在什么条件下能做什么，以及对用户/租户/数据/主机的实际影响。
+  例如：用当前任务的测试账号、操作和结果说明危害，标明是真实测试还是条件性演示。
+  写清已验证的范围，以及尚未验证的进一步后果。
 
 # 前提
 preconditions:

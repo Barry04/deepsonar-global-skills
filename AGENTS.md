@@ -2,6 +2,8 @@
 
 单一技能仓：
 
+- **finding-impact** — 缺陷危害通俗说明（独立 plugin，Skill 为 `explain-finding-impact`）。编写任务发现时，用大白话写实际危害、简单例子和验证边界，填入已有 `impact` 字段。入口见 [SKILL.md](finding-impact/skills/explain-finding-impact/SKILL.md)。
+
 1. **vuln-definitions** — 漏洞定义模块（独立 plugin，语义基线）  
 2. **vuln-definitions-oh** — OpenHarmony / Phone OS 系统漏洞定义（独立 plugin：四档/无效条款 + 移动 OS 通用类型）  
 2b. **vuln-definitions-chrome** — Chrome / Chromium 浏览器漏洞定义（独立 plugin：官方 S0–S3 + 沙箱/Site Isolation + 非安全条款 + Chrome VRP 资格）  
