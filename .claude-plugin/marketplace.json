@@ -7,8 +7,8 @@
   "plugins": [
     {
       "name": "finding-impact",
-      "description": "任务发现的缺陷危害通俗说明：用简短中文说明实际后果，配一个具体例子，并写清已验证范围与待验证后果。",
-      "version": "0.1.0",
+      "description": "任务发现的缺陷危害通俗说明：按读者背景，用简短中文、具体例子和必要的生活类比说明实际后果与验证边界。",
+      "version": "0.1.1",
       "source": "./finding-impact"
     },
     {
