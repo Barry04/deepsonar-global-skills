@@ -1,0 +1,8 @@
+{
+  "name": "finding-impact",
+  "version": "0.1.0",
+  "description": "任务发现的缺陷危害通俗说明：用简短中文说明实际后果，并配一个有证据边界的具体例子。",
+  "author": {
+    "name": "Barry04"
+  }
+}
